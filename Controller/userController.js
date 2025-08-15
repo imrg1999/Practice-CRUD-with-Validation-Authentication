@@ -26,6 +26,30 @@ export const showAllUsers = async(req,res) => {
     }
 }
 
+export const findUsersById = async(req,res) => {
+    try{
+        const {id} =  req.params;
+        const userId = await userModel.findById(id);
+    if(!userId){
+        res.status(404).json({
+            success: false,
+            message: "No users found"
+        })
+    } else {
+         res.status(200).json({
+            success: true,
+            user: userId
+        })
+    }
+    } catch(e) {
+        res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        })
+    }
+    
+}
+
 export const createNewUsers = async(req,res) => {
     try{
         const validUser = validationSchema.parse(req.body);

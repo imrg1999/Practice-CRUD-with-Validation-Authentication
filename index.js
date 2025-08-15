@@ -5,6 +5,10 @@ import userRoutes from './Routes/userRoutes.js'
 const port = 3000;
 const app = express();
 
+//Middlewares
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 //Route establishment
 app.use('/api',userRoutes);
 

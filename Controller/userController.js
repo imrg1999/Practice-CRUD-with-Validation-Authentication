@@ -3,8 +3,8 @@ import { userModel } from "../Model/userModel.js";
 export const showAllUsers = async(req,res) => {
     try{
         const allUsers = await userModel.find();
-        if(!allUsers) {
-            res.status(400).json({
+        if(allUsers.length === 0) {
+            res.status(404).json({
                 success: false,
                 message: "No Users listed"
             })
@@ -17,7 +17,7 @@ export const showAllUsers = async(req,res) => {
     } catch(e) {
          res.status(500).json({
                 success: false,
-                message: "Internal Server Error"
+                error: e.message
             })
     }
 }

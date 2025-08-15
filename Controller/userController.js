@@ -1,6 +1,7 @@
 import { userModel } from "../Model/userModel.js";
 import { validationSchema } from "../Validation/zodValidation.js";
 import { ZodError } from "zod";
+import { hashing } from "../Validation/passwordHash.js";
 
 export const showAllUsers = async(req,res) => {
     try{
@@ -28,9 +29,11 @@ export const showAllUsers = async(req,res) => {
 export const createNewUsers = async(req,res) => {
     try{
         const validUser = validationSchema.parse(req.body);
+        const passwordProtection = await hashing(validUser.password);
 
         const newUser = await userModel.create({
-            ...validUser
+            ...validUser,
+            password: passwordProtection
         });
         if(!newUser) {
             return res.status(404).json({
@@ -38,9 +41,9 @@ export const createNewUsers = async(req,res) => {
                 message: "No Users created"
             })
         } else {
-            res.status(200).json({
+            res.status(201).json({
                 success: true,
-                user: newuser
+                user: newUser
             })
         }
     }catch(e) {

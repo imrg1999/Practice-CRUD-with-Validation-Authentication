@@ -2,6 +2,8 @@ import { validationSchema } from "../Validation/zodValidation.js";
 import { ZodError } from "zod";
 import { hashing } from "../Validation/passwordHash.js";
 import { userModel } from "../Model/userModel.js";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 
 export const registerUser = async(req,res) => {
@@ -46,3 +48,53 @@ export const registerUser = async(req,res) => {
         }
     }
 } 
+
+export const login = async(req,res) => {
+    try{
+        const{email,password} = req.body;
+        
+        const user = await userModel.findOne({email});
+
+        //checking whether the user already exists
+        if(!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid email or password"
+            })
+        };
+
+        //Compare password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if(!isMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Details"
+            })
+        }
+
+        //JWT generation
+        const token = jwt.sign({
+            email: user.email
+        }, process.env.JWT_SECRET, 
+        {expiresIn: "1h"});
+
+         res.status(200).json({
+            message: "Login successful",
+            token
+        });
+    }catch(error) {
+        if(error instanceof ZodError) {
+            res.status(400).json({
+                success: false,
+                error: error.issues,
+                message: "No data found"
+            })
+        } else {
+            res.status(400).json({
+                success: false,
+                error: error.issues,
+                message: "No data found"
+            })
+        }
+    }
+}

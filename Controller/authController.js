@@ -73,15 +73,27 @@ export const login = async(req,res) => {
         }
 
         //JWT generation
-        const token = jwt.sign({
-            email: user.email
-        }, process.env.JWT_SECRET, 
-        {expiresIn: "1h"});
+        const token = jwt.sign(
+            {
+                email: user.email,
+            id: user._id
+        }, 
+        process.env.JWT_SECRET, 
+        {expiresIn: "1h"}
+    );
 
-         res.status(200).json({
+        if(!token) {
+            return res.status(404).json({
+                success: false,
+                message: "Login Failed"
+            })
+        } else {
+            res.status(200).json({
             message: "Login successful",
             token
         });
+    }
+
     }catch(error) {
         if(error instanceof ZodError) {
             res.status(400).json({

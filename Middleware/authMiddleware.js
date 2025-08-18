@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 
-const authMiddleware = async(req,res,next) => {
+export const authMiddleware = async(req,res,next) => {
     //Checking Authorization prop in request http header
     const authHeader = req.headers.authorization;
 

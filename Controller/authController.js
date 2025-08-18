@@ -90,11 +90,39 @@ export const login = async(req,res) => {
                 message: "No data found"
             })
         } else {
-            res.status(400).json({
+            res.status(500).json({
                 success: false,
-                error: error.issues,
-                message: "No data found"
+                message: "Internal Server Error"
             })
         }
+    }
+}
+
+export const accessProfile = async(req,res) => {
+    try{
+        const userProfile = await userModel.findById(req.user.id).select("-password");
+
+        if(!userProfile) {
+            return res.status(404).json({
+                success: false,
+                message: "Profile not found"
+            })
+        } else {
+            res.status(200).json({
+                success: true,
+                data: {
+    id: userProfile._id,
+    name: userProfile.name,
+    email: userProfile.email,
+    age: userProfile.age
+    // data to be returned to the authorized user
+  }
+            })
+        }
+    }catch(error) {
+         res.status(500).json({
+                success: false,
+                message: "Internal Server Error"
+            })
     }
 }
